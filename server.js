@@ -30,7 +30,8 @@ Recipes.create(
 app.get('/shopping-list', (req, res) => {
   res.json(ShoppingList.get());
 });
-
+//parses incoming request bodes with a set content-type
+//sets the parsed data to req.body as an object
 app.post('/shopping-list', jsonParser, (req, res) => {
   // ensure `name` and `budget` are in request body
   const requiredFields = ['name', 'budget'];
@@ -42,10 +43,25 @@ app.post('/shopping-list', jsonParser, (req, res) => {
       return res.status(400).send(message);
     }
   }
-
   const item = ShoppingList.create(req.body.name, req.body.budget);
   res.status(201).json(item);
 });
+
+app.post('/recipes', jsonParser, (req, res) => {
+
+  const requiredFields = ['name', 'ingredients'];
+  for (let i=0; i<requiredFields.length; i++) {
+    const field = requiredFields[i];
+    if (!(field in req.body)) {
+      const message = `Missing \`${field}\` in request body`
+      console.log(message);
+      return res.status(400).send(message);
+    }
+  }
+  const item = Recipes.create(req.body.name, req.body.ingredients);
+  res.status(201).json(item);
+});
+
 
 
 app.get('/recipes', (req, res) => {
